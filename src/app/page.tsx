@@ -14,6 +14,9 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-white">
+      <h1 className="mb-8 text-3xl font-bold text-gray-800">
+        Vercelとの連携成功!
+      </h1>
       <div className="w-[400px] h-[400px]">
         {animationData && (
           <Lottie animationData={animationData} loop={true} />
