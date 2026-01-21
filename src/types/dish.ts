@@ -55,7 +55,13 @@ export interface DishListParams {
   to_date?: string;
 }
 
+export interface PresignedUrlRequest {
+  content_type: string;
+  file_size: number;
+}
+
 export interface PresignedUrlResponse {
   upload_url: string;
   image_key: string;
+  expires_in: number;
 }

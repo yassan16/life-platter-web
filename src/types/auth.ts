@@ -1,9 +1,8 @@
 export interface User {
   id: string;
   email: string;
-  name: string;
-  avatar_url?: string;
-  created_at: string;
+  username: string;
+  status: string;
 }
 
 export interface LoginRequest {
@@ -14,14 +13,13 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string;
   password: string;
-  name: string;
+  username: string;
 }
 
 export interface AuthResponse {
   access_token: string;
   refresh_token: string;
   token_type: string;
-  user: User;
 }
 
 export interface RefreshTokenResponse {

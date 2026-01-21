@@ -4,6 +4,7 @@ import type {
   DishCreateRequest,
   DishListParams,
   DishListResponse,
+  PresignedUrlRequest,
   PresignedUrlResponse,
 } from '@/types/dish';
 
@@ -33,9 +34,12 @@ export async function createDish(data: DishCreateRequest): Promise<Dish> {
   });
 }
 
-export async function getPresignedUrl(): Promise<PresignedUrlResponse> {
+export async function getPresignedUrl(
+  request: PresignedUrlRequest
+): Promise<PresignedUrlResponse> {
   return apiFetch<PresignedUrlResponse>('/api/dishes/images/presigned-url', {
     method: 'POST',
+    body: JSON.stringify(request),
   });
 }
 

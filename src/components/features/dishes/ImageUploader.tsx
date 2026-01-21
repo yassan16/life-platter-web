@@ -60,7 +60,10 @@ export function ImageUploader({ onUploadComplete, onUploadError }: ImageUploader
 
       const compressed = await compressImage(img.file);
 
-      const { upload_url, image_key } = await getPresignedUrl();
+      const { upload_url, image_key } = await getPresignedUrl({
+        content_type: compressed.type || 'image/jpeg',
+        file_size: compressed.size,
+      });
 
       await uploadImageToS3(upload_url, compressed, (progress) => {
         setImages((prev) =>

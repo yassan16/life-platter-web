@@ -14,7 +14,7 @@ interface AuthState {
   isInitialized: boolean;
 
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => Promise<void>;
   initialize: () => Promise<void>;
 }
@@ -33,8 +33,12 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await authApi.login({ email, password });
           setAccessToken(response.access_token);
+
+          // ログイン成功後に /api/users/me を呼び出し
+          const user = await authApi.getMe();
+
           set({
-            user: response.user,
+            user,
             accessToken: response.access_token,
             refreshToken: response.refresh_token,
             isLoading: false,
@@ -45,13 +49,17 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      register: async (email: string, password: string, name: string) => {
+      register: async (email: string, password: string, username: string) => {
         set({ isLoading: true });
         try {
-          const response = await authApi.register({ email, password, name });
+          const response = await authApi.register({ email, password, username });
           setAccessToken(response.access_token);
+
+          // 登録成功後に /api/users/me を呼び出し
+          const user = await authApi.getMe();
+
           set({
-            user: response.user,
+            user,
             accessToken: response.access_token,
             refreshToken: response.refresh_token,
             isLoading: false,
