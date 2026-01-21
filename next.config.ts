@@ -10,6 +10,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://dm1vi7xjicrqg.cloudfront.net/api/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

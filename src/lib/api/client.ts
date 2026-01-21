@@ -1,4 +1,5 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dm1vi7xjicrqg.cloudfront.net';
+// 本番環境では相対パス（rewritesでプロキシ）、開発環境では直接接続も可能
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export class ApiError extends Error {
   constructor(
