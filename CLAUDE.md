@@ -15,12 +15,38 @@ life_platter-web
 - デプロイ: Vercel
 
 ## HOW（開発ガイドライン）
+
 ### コマンド
+
 - `npm run dev` - 開発サーバー起動
 - `npm run build` - 本番ビルド
 - `npm run lint` - ESLint実行
 
+### SuperClaudeの使用
+
+アウトプットの精度を向上させるため、**SuperClaude**スキルを必ず使用してください。
+
+### ドキュメント作成
+
+- ファイルの作成・変更時は関連する`README.md` を更新してください。
+
+### 図表の使い分け
+
+Mermaid記法を使い、以下のように使い分けてください。
+
+| 図表              | 用途                       |
+| ----------------- | -------------------------- |
+| `erDiagram`       | テーブル関係・カラム定義   |
+| `sequenceDiagram` | API呼び出し・処理フロー    |
+| `flowchart`       | 判定ロジック・状態遷移     |
+| Markdownテーブル  | カラム説明・ステータス一覧 |
+
+### ドキュメント構造
+
+- 概要、目次、以降に詳細説明を追記すること
+- #, ##, ### 見出しを適切に使い分け、必ず階層構造を守り、目次のリンクを貼ること
+
 ### ドキュメント
-- Mermaidでフローチャートやシーケンス図を活用
+  
 - 詳細なアーキテクチャ: [docs/architecture.md](docs/architecture.md)
 - 機能モジュール責務: [docs/modules.md](docs/modules.md)
