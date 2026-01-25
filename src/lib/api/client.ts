@@ -1,4 +1,5 @@
-// 本番環境では相対パス（rewritesでプロキシ）、開発環境では直接接続も可能
+// 空文字の場合は相対パス（Next.js rewrites 経由でプロキシ）
+// これによりCORSエラーを回避: ブラウザ → Next.js → バックエンドAPI
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export class ApiError extends Error {
