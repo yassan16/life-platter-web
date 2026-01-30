@@ -50,3 +50,4 @@ Mermaid記法を使い、以下のように使い分けてください。
   
 - 詳細なアーキテクチャ: [docs/architecture.md](docs/architecture.md)
 - 機能モジュール責務: [docs/modules.md](docs/modules.md)
+- ビルドフロー: [docs/build-flow.md](docs/build-flow.md)
