@@ -4,6 +4,11 @@ export const metadata = {
   title: '料理を登録 - Life Platter',
 };
 
-export default function AddDishPage() {
-  return <DishForm />;
+export default async function AddDishPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ date?: string }>;
+}) {
+  const { date } = await searchParams;
+  return <DishForm defaultDate={date} />;
 }

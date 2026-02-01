@@ -16,9 +16,9 @@ import {
 } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { clsx } from 'clsx';
-import { getDishes, getDish } from '@/lib/api/dishes';
-import type { Dish, DishListItem } from '@/types/dish';
-import { DishDetailModal } from '@/components/features/dishes/DishDetailModal';
+import { getDishes } from '@/lib/api/dishes';
+import type { DishListItem } from '@/types/dish';
+import { DayDetailSheet } from '@/components/features/calendar/DayDetailSheet';
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
@@ -26,9 +26,8 @@ export function MonthCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [dishes, setDishes] = useState<DishListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const [isDaySheetOpen, setIsDaySheetOpen] = useState(false);
+  const [daySheetDate, setDaySheetDate] = useState('');
 
   const fetchDishes = useCallback(async () => {
     setIsLoading(true);
@@ -51,6 +50,11 @@ export function MonthCalendar() {
     fetchDishes();
   }, [fetchDishes]);
 
+  useEffect(() => {
+    setIsDaySheetOpen(false);
+    setDaySheetDate('');
+  }, [currentDate]);
+
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
@@ -69,23 +73,13 @@ export function MonthCalendar() {
     setCurrentDate(addMonths(currentDate, 1));
   };
 
-  const handleDishClick = async (dish: DishListItem) => {
-    setIsLoadingDetail(true);
-    setIsModalOpen(true);
-    try {
-      const detail = await getDish(dish.id);
-      setSelectedDish(detail);
-    } catch (err) {
-      console.error('Failed to fetch dish detail:', err);
-      setIsModalOpen(false);
-    } finally {
-      setIsLoadingDetail(false);
-    }
+  const handleDishAdded = () => {
+    fetchDishes();
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedDish(null);
+  const handleCloseDaySheet = () => {
+    setIsDaySheetOpen(false);
+    setDaySheetDate('');
   };
 
   return (
@@ -94,12 +88,14 @@ export function MonthCalendar() {
         <button
           onClick={handlePrevMonth}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors active:scale-95"
+          aria-label="前の月"
         >
           <svg
             className="w-5 h-5 text-gray-600"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -117,12 +113,14 @@ export function MonthCalendar() {
         <button
           onClick={handleNextMonth}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors active:scale-95"
+          aria-label="次の月"
         >
           <svg
             className="w-5 h-5 text-gray-600"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -155,13 +153,25 @@ export function MonthCalendar() {
           const isToday = isSameDay(day, new Date());
           const dayOfWeek = day.getDay();
 
+          const handleCellClick = () => {
+            if (isCurrentMonth && !isLoading) {
+              setDaySheetDate(format(day, 'yyyy-MM-dd'));
+              setIsDaySheetOpen(true);
+            }
+          };
+
           return (
-            <div
+            <button
               key={day.toISOString()}
+              onClick={handleCellClick}
+              type="button"
+              aria-label={`${format(day, 'M月d日')}${dayDishes.length > 0 ? ` ${dayDishes.length}件の料理` : ''}`}
+              disabled={!isCurrentMonth || isLoading}
               className={clsx(
-                'min-h-[80px] p-1 rounded-lg border',
+                'min-h-[80px] p-1 rounded-lg border text-left w-full',
                 isCurrentMonth ? 'bg-white border-gray-100' : 'bg-gray-50 border-gray-50',
-                isToday && 'ring-2 ring-orange-500'
+                isToday && 'ring-2 ring-orange-500',
+                isCurrentMonth && !isLoading && 'cursor-pointer'
               )}
             >
               <div
@@ -185,11 +195,7 @@ export function MonthCalendar() {
               {!isLoading && dayDishes.length > 0 && (
                 <div className="space-y-1">
                   {dayDishes.slice(0, 2).map((dish) => (
-                    <button
-                      key={dish.id}
-                      onClick={() => handleDishClick(dish)}
-                      className="w-full rounded overflow-hidden active:scale-95 transition-transform"
-                    >
+                    <div key={dish.id} className="w-full rounded overflow-hidden">
                       {dish.thumbnail_url ? (
                         <div className="relative aspect-square">
                           <Image
@@ -207,7 +213,7 @@ export function MonthCalendar() {
                           </span>
                         </div>
                       )}
-                    </button>
+                    </div>
                   ))}
                   {dayDishes.length > 2 && (
                     <div className="text-[10px] text-gray-400 text-center">
@@ -216,16 +222,17 @@ export function MonthCalendar() {
                   )}
                 </div>
               )}
-            </div>
+            </button>
           );
         })}
       </div>
 
-      <DishDetailModal
-        dish={selectedDish}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        isLoading={isLoadingDetail}
+      <DayDetailSheet
+        isOpen={isDaySheetOpen}
+        onClose={handleCloseDaySheet}
+        date={daySheetDate}
+        dishes={daySheetDate ? getDishesForDate(new Date(daySheetDate + 'T00:00:00')) : []}
+        onDishAdded={handleDishAdded}
       />
     </div>
   );

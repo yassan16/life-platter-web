@@ -9,10 +9,15 @@ import { ImageUploader } from '@/components/features/dishes/ImageUploader';
 import { createDish } from '@/lib/api/dishes';
 import { ApiError } from '@/lib/api/client';
 
-export function DishForm() {
+interface DishFormProps {
+  defaultDate?: string;
+  onSuccess?: () => void;
+}
+
+export function DishForm({ defaultDate, onSuccess }: DishFormProps) {
   const router = useRouter();
   const [name, setName] = useState('');
-  const [cookedAt, setCookedAt] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [cookedAt, setCookedAt] = useState(defaultDate ?? format(new Date(), 'yyyy-MM-dd'));
   const [imageKeys, setImageKeys] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -46,7 +51,11 @@ export function DishForm() {
         })),
       });
 
-      router.push('/calendar');
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push('/calendar');
+      }
     } catch (err) {
       if (err instanceof ApiError) {
         setError('料理の登録に失敗しました');
@@ -59,7 +68,7 @@ export function DishForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 space-y-6">
+    <form onSubmit={handleSubmit} className="p-4 pb-0 space-y-6">
       <h2 className="text-xl font-bold text-gray-900">料理を登録</h2>
 
       {error && (
@@ -99,14 +108,16 @@ export function DishForm() {
         </div>
       </div>
 
-      <Button
-        type="submit"
-        isLoading={isSubmitting}
-        className="w-full"
-        size="lg"
-      >
-        登録する
-      </Button>
+      <div className="sticky bottom-0 bg-white pb-safe pt-2 pb-4 -mx-4 px-4">
+        <Button
+          type="submit"
+          isLoading={isSubmitting}
+          className="w-full"
+          size="lg"
+        >
+          登録する
+        </Button>
+      </div>
     </form>
   );
 }
