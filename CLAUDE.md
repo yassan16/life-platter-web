@@ -22,9 +22,13 @@ life_platter-web
 - `npm run build` - 本番ビルド
 - `npm run lint` - ESLint実行
 
-### SuperClaudeの使用
+### SuperClaude・skillsの使用
 
-アウトプットの精度を向上させるため、**SuperClaude**スキルを必ず使用してください。
+- アウトプットの精度を向上させるため、以下のスキルを必ず使用してください
+  - /skills
+  - **SuperClaude**
+  - **vercel-react-best-practices**
+  - **web-design-guidelines**
 
 ### ドキュメント作成
 
