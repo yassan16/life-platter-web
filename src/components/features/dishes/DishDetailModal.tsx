@@ -14,7 +14,7 @@ interface DishDetailModalProps {
 export function DishDetailModal({ dish, isOpen, onClose, isLoading }: DishDetailModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="p-4 pb-8">
+      <div className="flex-1 overflow-y-auto min-h-0 p-4 pb-8">
         <DishDetailContent dish={dish} isLoading={!!isLoading} />
       </div>
     </Modal>

@@ -68,47 +68,49 @@ export function DishForm({ defaultDate, onSuccess }: DishFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 pb-0 space-y-6">
-      <h2 className="text-xl font-bold text-gray-900">料理を登録</h2>
+    <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-y-auto">
+      <div className="flex-1 p-4 space-y-6">
+        <h2 className="text-xl font-bold text-gray-900">料理を登録</h2>
 
-      {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
-          {error}
-        </div>
-      )}
+        {error && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+            {error}
+          </div>
+        )}
 
-      <div className="space-y-4">
-        <Input
-          type="text"
-          label="料理名"
-          name="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="例: カレーライス"
-          required
-        />
-
-        <Input
-          type="date"
-          label="調理日"
-          name="cookedAt"
-          value={cookedAt}
-          onChange={(e) => setCookedAt(e.target.value)}
-          required
-        />
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            写真
-          </label>
-          <ImageUploader
-            onUploadComplete={handleImageUpload}
-            onUploadError={handleImageError}
+        <div className="space-y-4">
+          <Input
+            type="text"
+            label="料理名"
+            name="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="例: カレーライス"
+            required
           />
+
+          <Input
+            type="date"
+            label="調理日"
+            name="cookedAt"
+            value={cookedAt}
+            onChange={(e) => setCookedAt(e.target.value)}
+            required
+          />
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              写真
+            </label>
+            <ImageUploader
+              onUploadComplete={handleImageUpload}
+              onUploadError={handleImageError}
+            />
+          </div>
         </div>
       </div>
 
-      <div className="sticky bottom-0 bg-white pb-safe pt-2 pb-4 -mx-4 px-4">
+      <div className="sticky bottom-0 bg-white pt-2 px-4 pb-safe shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
         <Button
           type="submit"
           isLoading={isSubmitting}

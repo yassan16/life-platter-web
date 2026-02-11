@@ -65,7 +65,7 @@ function DayDetailSheetContent({
 
   if (view === 'detail') {
     return (
-      <div className="px-4 pb-safe pb-8 motion-safe:animate-slide-in-right">
+      <div className="flex-1 overflow-y-auto min-h-0 px-4 pb-8 motion-safe:animate-slide-in-right">
         <button
           onClick={handleBack}
           className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors mb-2"
@@ -94,7 +94,7 @@ function DayDetailSheetContent({
 
   if (view === 'add') {
     return (
-      <div>
+      <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
         <button
           onClick={() => setView('list')}
           className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors mb-2 px-4"
@@ -122,7 +122,7 @@ function DayDetailSheetContent({
   }
 
   return (
-    <div className="px-4 pb-safe pb-8">
+    <div className="flex-1 overflow-y-auto min-h-0 px-4 pb-8">
       <h2 className="text-lg font-bold text-gray-900 mb-4">
         {formattedDate}
       </h2>
@@ -214,7 +214,7 @@ export function DayDetailSheet({
   }, [view, handleClose]);
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} onEscape={handleEscape}>
+    <Modal isOpen={isOpen} onClose={handleClose} onEscape={handleEscape} height="h-[60vh]">
       <DayDetailSheetContent
         key={date}
         date={date}
