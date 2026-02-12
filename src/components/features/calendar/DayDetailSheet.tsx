@@ -214,7 +214,7 @@ export function DayDetailSheet({
   }, [view, handleClose]);
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} onEscape={handleEscape} height="h-[60vh]">
+    <Modal isOpen={isOpen} onClose={handleClose} onEscape={handleEscape} height="max-h-[80vh]" swipeable>
       <DayDetailSheetContent
         key={date}
         date={date}

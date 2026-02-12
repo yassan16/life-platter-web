@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useBottomSheetDrag } from '@/lib/hooks/useBottomSheetDrag';
 
 interface ModalProps {
   isOpen: boolean;
@@ -8,9 +9,23 @@ interface ModalProps {
   onEscape?: () => void;
   children: React.ReactNode;
   height?: string;
+  swipeable?: boolean;
 }
 
-export function Modal({ isOpen, onClose, onEscape, children, height = 'h-[90vh]' }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  onEscape,
+  children,
+  height = 'h-[90vh]',
+  swipeable = false,
+}: ModalProps) {
+  const { sheetRef, isDragging, isClosing, sheetStyle, overlayOpacity } =
+    useBottomSheetDrag({
+      onClose,
+      enabled: swipeable && isOpen,
+    });
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -42,18 +57,35 @@ export function Modal({ isOpen, onClose, onEscape, children, height = 'h-[90vh]'
 
   if (!isOpen) return null;
 
+  const hasSwipeInteraction = isDragging || isClosing;
+
   return (
     <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true">
       <div
-        className="absolute inset-0 bg-black/50 motion-safe:animate-fade-in"
-        onClick={onClose}
+        className={`absolute inset-0 bg-black/50 ${!hasSwipeInteraction ? 'motion-safe:animate-fade-in' : ''}`}
+        style={
+          swipeable
+            ? {
+                opacity: overlayOpacity,
+                transition: isClosing ? 'opacity 200ms ease-in' : undefined,
+              }
+            : undefined
+        }
+        onClick={isClosing ? undefined : onClose}
         role="presentation"
       />
       <div
-        className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl motion-safe:animate-slide-up ${height} flex flex-col overflow-hidden`}
-        style={{ overscrollBehavior: 'contain', touchAction: 'manipulation' }}
+        ref={swipeable ? sheetRef : undefined}
+        className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl ${!isClosing ? 'motion-safe:animate-slide-up' : ''} ${height} flex flex-col overflow-hidden`}
+        style={{
+          overscrollBehavior: 'contain',
+          touchAction: swipeable ? 'pan-x' : 'manipulation',
+          ...(swipeable ? sheetStyle : {}),
+        }}
       >
-        <div className="flex-shrink-0 flex justify-center pt-3 pb-2">
+        <div
+          className={`flex-shrink-0 flex justify-center pt-3 pb-2 ${swipeable ? 'cursor-grab active:cursor-grabbing' : ''}`}
+        >
           <div className="w-10 h-1 bg-gray-300 rounded-full" />
         </div>
         {children}
