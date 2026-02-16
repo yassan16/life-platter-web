@@ -41,6 +41,14 @@ export interface DishCreateRequest {
   images?: ImageInput[];
 }
 
+export interface DishUpdateRequest {
+  name?: string;
+  cooked_at?: string;
+  category_id?: string | null;
+  images_to_add?: ImageInput[];
+  images_to_delete?: string[];
+}
+
 export interface DishListResponse {
   items: DishListItem[];
   next_cursor?: string | null;

@@ -8,7 +8,7 @@ import { getDish } from '@/lib/api/dishes';
 import type { Dish, DishListItem } from '@/types/dish';
 
 export function DishList() {
-  const { dishes, isLoading, hasMore, error, loadMore } = useDishes({ limit: 20 });
+  const { dishes, isLoading, hasMore, error, loadMore, refresh, removeDish } = useDishes({ limit: 20 });
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
@@ -67,6 +67,16 @@ export function DishList() {
   };
 
   const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedDish(null);
+  };
+
+  const handleDishUpdated = () => {
+    refresh();
+  };
+
+  const handleDishDeleted = (dishId: string) => {
+    removeDish(dishId);
     setIsModalOpen(false);
     setSelectedDish(null);
   };
@@ -137,6 +147,8 @@ export function DishList() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         isLoading={isLoadingDetail}
+        onDishUpdated={handleDishUpdated}
+        onDishDeleted={handleDishDeleted}
       />
     </div>
   );

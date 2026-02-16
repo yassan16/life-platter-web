@@ -11,6 +11,7 @@ interface UseDishesResult {
   error: string | null;
   loadMore: () => Promise<void>;
   refresh: () => Promise<void>;
+  removeDish: (id: string) => void;
 }
 
 export function useDishes(params?: Omit<DishListParams, 'cursor'>): UseDishesResult {
@@ -68,6 +69,10 @@ export function useDishes(params?: Omit<DishListParams, 'cursor'>): UseDishesRes
     await fetchDishes(true);
   }, [fetchDishes]);
 
+  const removeDish = useCallback((id: string) => {
+    setDishes((prev) => prev.filter((dish) => dish.id !== id));
+  }, []);
+
   return {
     dishes,
     isLoading,
@@ -75,5 +80,6 @@ export function useDishes(params?: Omit<DishListParams, 'cursor'>): UseDishesRes
     error,
     loadMore,
     refresh,
+    removeDish,
   };
 }

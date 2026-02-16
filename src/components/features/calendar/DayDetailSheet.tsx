@@ -6,12 +6,14 @@ import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
+import { ActionMenu } from '@/components/ui/ActionMenu';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { DishForm } from '@/components/features/dishes/DishForm';
 import { DishDetailContent } from '@/components/features/dishes/DishDetailContent';
-import { getDish } from '@/lib/api/dishes';
+import { getDish, deleteDish } from '@/lib/api/dishes';
 import type { Dish, DishListItem } from '@/types/dish';
 
-type SheetView = 'list' | 'add' | 'detail';
+type SheetView = 'list' | 'add' | 'detail' | 'edit';
 
 interface DayDetailSheetProps {
   isOpen: boolean;
@@ -19,12 +21,14 @@ interface DayDetailSheetProps {
   date: string;
   dishes: DishListItem[];
   onDishAdded: () => void;
+  onDishDeleted?: () => void;
 }
 
 function DayDetailSheetContent({
   date,
   dishes,
   onDishAdded,
+  onDishDeleted,
   view,
   setView,
 }: Omit<DayDetailSheetProps, 'isOpen' | 'onClose'> & {
@@ -33,6 +37,8 @@ function DayDetailSheetContent({
 }) {
   const [dishDetail, setDishDetail] = useState<Dish | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleAddSuccess = () => {
     onDishAdded();
@@ -59,36 +65,102 @@ function DayDetailSheetContent({
     setDishDetail(null);
   };
 
+  const handleEditSuccess = () => {
+    onDishDeleted?.();
+    setView('list');
+    setDishDetail(null);
+  };
+
+  const handleDelete = async () => {
+    if (!dishDetail) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteDish(dishDetail.id);
+      setShowDeleteConfirm(false);
+      setView('list');
+      setDishDetail(null);
+      onDishDeleted?.();
+    } catch {
+      setIsDeleting(false);
+    }
+  };
+
+  const menuItems = [
+    {
+      label: '編集',
+      onClick: () => setView('edit'),
+    },
+    {
+      label: '削除',
+      onClick: () => setShowDeleteConfirm(true),
+      variant: 'danger' as const,
+    },
+  ];
+
   const formattedDate = date
     ? format(parseISO(date), 'M月d日(E)', { locale: ja })
     : '';
 
+  const backButton = (
+    <button
+      onClick={handleBack}
+      className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors mb-2"
+      aria-label="一覧に戻る"
+    >
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M15 19l-7-7 7-7"
+        />
+      </svg>
+      戻る
+    </button>
+  );
+
+  if (view === 'edit' && dishDetail) {
+    return (
+      <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+        <div className="px-4">
+          {backButton}
+        </div>
+        <DishForm mode="edit" dish={dishDetail} onSuccess={handleEditSuccess} />
+      </div>
+    );
+  }
+
   if (view === 'detail') {
     return (
-      <div className="flex-1 overflow-y-auto min-h-0 px-4 pb-8 motion-safe:animate-slide-in-right">
-        <button
-          onClick={handleBack}
-          className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors mb-2"
-          aria-label="一覧に戻る"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          戻る
-        </button>
-        <DishDetailContent dish={dishDetail} isLoading={isLoadingDetail} />
-      </div>
+      <>
+        <div className="flex-1 overflow-y-auto min-h-0 px-4 pb-8 motion-safe:animate-slide-in-right">
+          <div className="flex items-center justify-between mb-2">
+            {backButton}
+            {dishDetail && !isLoadingDetail && (
+              <ActionMenu items={menuItems} />
+            )}
+          </div>
+          <DishDetailContent dish={dishDetail} isLoading={isLoadingDetail} />
+        </div>
+
+        <ConfirmDialog
+          isOpen={showDeleteConfirm}
+          onClose={() => setShowDeleteConfirm(false)}
+          onConfirm={handleDelete}
+          title="料理を削除"
+          message="この料理を削除しますか？この操作は取り消せません。"
+          confirmLabel="削除する"
+          variant="danger"
+          isLoading={isDeleting}
+        />
+      </>
     );
   }
 
@@ -197,6 +269,7 @@ export function DayDetailSheet({
   date,
   dishes,
   onDishAdded,
+  onDishDeleted,
 }: DayDetailSheetProps) {
   const [view, setView] = useState<SheetView>('list');
 
@@ -220,6 +293,7 @@ export function DayDetailSheet({
         date={date}
         dishes={dishes}
         onDishAdded={onDishAdded}
+        onDishDeleted={onDishDeleted}
         view={view}
         setView={setView}
       />

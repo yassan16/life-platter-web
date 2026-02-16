@@ -2,6 +2,7 @@ import { apiFetch } from './client';
 import type {
   Dish,
   DishCreateRequest,
+  DishUpdateRequest,
   DishListParams,
   DishListResponse,
   PresignedUrlRequest,
@@ -31,6 +32,19 @@ export async function createDish(data: DishCreateRequest): Promise<Dish> {
   return apiFetch<Dish>('/api/dishes', {
     method: 'POST',
     body: JSON.stringify(data),
+  });
+}
+
+export async function updateDish(id: string, data: DishUpdateRequest): Promise<Dish> {
+  return apiFetch<Dish>(`/api/dishes/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteDish(id: string): Promise<void> {
+  await apiFetch<void>(`/api/dishes/${id}`, {
+    method: 'DELETE',
   });
 }
 

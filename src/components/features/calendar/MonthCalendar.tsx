@@ -233,6 +233,7 @@ export function MonthCalendar() {
         date={daySheetDate}
         dishes={daySheetDate ? getDishesForDate(new Date(daySheetDate + 'T00:00:00')) : []}
         onDishAdded={handleDishAdded}
+        onDishDeleted={handleDishAdded}
       />
     </div>
   );
