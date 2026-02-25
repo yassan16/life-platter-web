@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import {
   format,
@@ -61,9 +61,15 @@ export function MonthCalendar() {
   const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
   const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
-  const getDishesForDate = (date: Date): DishListItem[] => {
-    return dishes.filter((dish) => isSameDay(new Date(dish.cooked_at), date));
-  };
+  const dishesByDate = useMemo(() => {
+    const map = new Map<string, DishListItem[]>();
+    for (const dish of dishes) {
+      const key = format(new Date(dish.cooked_at), 'yyyy-MM-dd');
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(dish);
+    }
+    return map;
+  }, [dishes]);
 
   const handlePrevMonth = () => {
     setCurrentDate(subMonths(currentDate, 1));
@@ -72,6 +78,13 @@ export function MonthCalendar() {
   const handleNextMonth = () => {
     setCurrentDate(addMonths(currentDate, 1));
   };
+
+  const handleGoToToday = () => {
+    setCurrentDate(new Date());
+  };
+
+  const today = new Date();
+  const isViewingCurrentMonth = isSameMonth(currentDate, today);
 
   const handleDishAdded = () => {
     fetchDishes();
@@ -84,8 +97,9 @@ export function MonthCalendar() {
 
   return (
     <div className="p-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="relative flex items-center mb-4">
         <button
+          type="button"
           onClick={handlePrevMonth}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors active:scale-95"
           aria-label="前の月"
@@ -106,30 +120,42 @@ export function MonthCalendar() {
           </svg>
         </button>
 
-        <h2 className="text-lg font-bold text-gray-900">
+        <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold text-gray-900 pointer-events-none select-none">
           {format(currentDate, 'yyyy年M月', { locale: ja })}
         </h2>
 
-        <button
-          onClick={handleNextMonth}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors active:scale-95"
-          aria-label="次の月"
-        >
-          <svg
-            className="w-5 h-5 text-gray-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
+        <div className="ml-auto flex items-center gap-3">
+          <button
+            onClick={handleGoToToday}
+            disabled={isViewingCurrentMonth}
+            className="px-3 py-1 text-sm font-medium rounded-lg transition-colors active:scale-95 text-orange-500 hover:bg-orange-50 disabled:text-gray-300 disabled:hover:bg-transparent disabled:cursor-default"
+            aria-label={isViewingCurrentMonth ? '現在の月を表示中' : '今日の月へ戻る'}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
+            今日
+          </button>
+
+          <button
+            type="button"
+            onClick={handleNextMonth}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors active:scale-95"
+            aria-label="次の月"
+          >
+            <svg
+              className="w-5 h-5 text-gray-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-7 gap-1 mb-2">
@@ -148,9 +174,9 @@ export function MonthCalendar() {
 
       <div className="grid grid-cols-7 gap-1">
         {days.map((day) => {
-          const dayDishes = getDishesForDate(day);
+          const dayDishes = dishesByDate.get(format(day, 'yyyy-MM-dd')) ?? [];
           const isCurrentMonth = isSameMonth(day, currentDate);
-          const isToday = isSameDay(day, new Date());
+          const isToday = isSameDay(day, today);
           const dayOfWeek = day.getDay();
 
           const handleCellClick = () => {
@@ -231,7 +257,7 @@ export function MonthCalendar() {
         isOpen={isDaySheetOpen}
         onClose={handleCloseDaySheet}
         date={daySheetDate}
-        dishes={daySheetDate ? getDishesForDate(new Date(daySheetDate + 'T00:00:00')) : []}
+        dishes={daySheetDate ? (dishesByDate.get(daySheetDate) ?? []) : []}
         onDishAdded={handleDishAdded}
         onDishDeleted={handleDishAdded}
       />
