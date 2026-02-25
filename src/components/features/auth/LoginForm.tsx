@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { PasswordInput } from '@/components/ui/PasswordInput';
 import { useAuthStore } from '@/stores/authStore';
 import { ApiError } from '@/lib/api/client';
 
@@ -50,8 +51,7 @@ export function LoginForm() {
         autoComplete="email"
       />
 
-      <Input
-        type="password"
+      <PasswordInput
         label="パスワード"
         name="password"
         value={password}
