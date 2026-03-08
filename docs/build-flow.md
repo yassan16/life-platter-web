@@ -393,3 +393,4 @@ flowchart LR
 #### 環境変数の管理
 
 Vercelダッシュボードで環境変数を設定する。`next.config.ts` で参照する `API_REWRITE_DESTINATION` や `NEXT_PUBLIC_IMAGE_HOST` はVercel側で管理する。
+

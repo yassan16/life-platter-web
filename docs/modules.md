@@ -47,15 +47,23 @@
 |---------|------|
 | `src/components/ui/Button.tsx` | ボタン |
 | `src/components/ui/Modal.tsx` | モーダル |
+| `src/components/ui/MaintenancePage.tsx` | メンテナンス画面コンポーネント（30秒ヘルスチェック機能付き） |
+
+### app（Client Component 境界）
+
+| ファイル | 責務 |
+|---------|------|
+| `src/app/MaintenanceOverlay.tsx` | `maintenanceStore` を監視してメンテナンス画面をオーバーレイ表示する Client Component |
 
 ## API・状態管理
 
 | ファイル | 責務 |
 |---------|------|
-| `src/lib/api/client.ts` | HTTP クライアント基盤 |
+| `src/lib/api/client.ts` | HTTP クライアント基盤（`MaintenanceError` 検知含む） |
 | `src/lib/api/auth.ts` | 認証 API |
 | `src/lib/api/dishes.ts` | 料理 API |
 | `src/stores/authStore.ts` | 認証状態管理（Zustand） |
+| `src/stores/maintenanceStore.ts` | メンテナンス状態管理（`isMaintenance`） |
 | `src/lib/hooks/useDishes.ts` | 料理データフック |
 
 ## 型定義
@@ -64,3 +72,4 @@
 |---------|------|
 | `src/types/auth.ts` | 認証関連型定義 |
 | `src/types/dish.ts` | 料理関連型定義 |
+

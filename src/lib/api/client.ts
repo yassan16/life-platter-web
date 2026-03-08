@@ -12,6 +12,13 @@ export class ApiError extends Error {
   }
 }
 
+export class MaintenanceError extends ApiError {
+  constructor(status: number) {
+    super(status, 'サービスは現在メンテナンス中です');
+    this.name = 'MaintenanceError';
+  }
+}
+
 let accessToken: string | null = null;
 
 export function setAccessToken(token: string | null) {
@@ -47,6 +54,12 @@ export async function apiFetch<T>(
   });
 
   if (!response.ok) {
+    const contentType = response.headers.get('content-type') ?? '';
+    if ([502, 503, 504].includes(response.status) && contentType.includes('text/html')) {
+      const { setMaintenance } = (await import('@/stores/maintenanceStore')).useMaintenanceStore.getState();
+      setMaintenance(true);
+      throw new MaintenanceError(response.status);
+    }
     const errorMessage = await response.text().catch(() => 'Unknown error');
     throw new ApiError(response.status, errorMessage);
   }
